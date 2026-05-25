@@ -1,36 +1,44 @@
 import type { Request, Response } from "express";
 import { issuesService } from "./issues.service";
+import sendResponse from "../../utils/sendResponse";
 
  const createIssueController = async (req: Request, res: Response) => {
   try {
     const result = await issuesService.createIssue(req.body, req.user.id);
 
-    res.status(201).json({
+    
+    sendResponse(res, {
+      statusCode: 201,
       success: true,
       message: "Issue created successfully",
       data: result,
     });
   } catch (error: unknown) {
-    res.status(400).json({
+    
+    sendResponse(res, {
+      statusCode: 201,
       success: false,
       message: error instanceof Error ? error.message : "Error",
     });
+    
   }
 };
  const getAllIssuesController = async (req: Request, res: Response) => {
   try {
     const result = await issuesService.getAllIssues(req.query);
-
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
-      message: "Issues fetched successfully",
+      message: "Issues retrieved successfully",
       data: result,
     });
   } catch (error: unknown) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error instanceof Error ? error.message : "Error",
     });
+    
   }
 };
 const getSingleIssueController = async (req: Request, res: Response) => {
@@ -38,13 +46,15 @@ const getSingleIssueController = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
     const result = await issuesService.getSingleIssue(id);
-
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
+      message: "Issues retrieved successfully",
       data: result,
     });
   } catch (error: unknown) {
-    res.status(404).json({
+    sendResponse(res, {
+      statusCode: 404,
       success: false,
       message: error instanceof Error ? error.message : "Something went wrong",
     });
@@ -59,15 +69,16 @@ const updateIssueController = async (req: Request, res: Response) => {
       req.body,
       req.user!,
     );
-
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue updated successfully",
       data: result,
     });
   } catch (error: unknown) {
-    res.status(400).json({
-      success: false,
+    sendResponse(res, {
+      statusCode: 400,
+      success: true,
       message: error instanceof Error ? error.message : "Something went wrong",
     });
   }
@@ -78,12 +89,18 @@ const deleteIssueController = async (req: Request, res: Response) => {
 
     await issuesService.deleteIssue(issueId, req.user!);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue deleted successfully",
     });
   } catch (error: unknown) {
     res.status(403).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Something went wrong",
+    });
+    sendResponse(res, {
+      statusCode: 403,
       success: false,
       message: error instanceof Error ? error.message : "Something went wrong",
     });
