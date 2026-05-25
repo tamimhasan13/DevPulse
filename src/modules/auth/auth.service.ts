@@ -46,7 +46,7 @@ import type { IUser } from "./auth.interface";
 };
 const loginUser = async (payload: { email: string; password: string }) => {
   const { email, password } = payload;
-  // 1. find user
+  // find user
   const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [
     email,
   ]);
@@ -57,22 +57,21 @@ const loginUser = async (payload: { email: string; password: string }) => {
     throw new Error("User not found");
   }
 
-  // 2. check password
+  //check password
   const isPasswordMatch = await bcrypt.compare(password, user.password);
 
   if (!isPasswordMatch) {
     throw new Error("Invalid password");
   }
 
-  // 3. create token
+  //create token
   const token = createToken({
     id: user.id,
     name: user.name,
     role: user.role,
   });
 
-  // remove password
-  // delete user.password;
+  // delete user and password;
   const { password: _, ...safeUser } = user;
 
   return {
