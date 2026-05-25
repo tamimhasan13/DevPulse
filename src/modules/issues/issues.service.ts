@@ -24,47 +24,47 @@ const getAllIssues = async (query: IGetIssueQuery) => {
   const values: string[] = [];
   const conditions: string[] = [];
 
-  // FILTER: status
+  // filter status
   if (status) {
     values.push(status);
     conditions.push(`status = $${values.length}`);
   }
 
-  // FILTER: type
+  // filter
   if (type) {
     values.push(type);
     conditions.push(`type = $${values.length}`);
   }
 
-  // WHERE
+  // where
   if (conditions.length > 0) {
     sql += ` WHERE ` + conditions.join(" AND ");
   }
 
-  // SORT
+  // sort
   if (sort === "oldest") {
     sql += ` ORDER BY created_at ASC`;
   } else {
     sql += ` ORDER BY created_at DESC`;
   }
 
-  // GET ISSUES
+  // get issues
   const result = await pool.query(sql, values);
 
   const issues = result.rows;
 
-  // NO ISSUES
+  //no issues
   if (issues.length === 0) {
     return [];
   }
 
-  // GET UNIQUE REPORTER IDS
+  // get unique reporter id 
   const reporterIds = [...new Set(issues.map((issue) => issue.reporter_id))];
 
-  // DYNAMIC PLACEHOLDERS
+  // dynamic placeholders
   const placeholders = reporterIds.map((_, index) => `$${index + 1}`).join(",");
 
-  // GET REPORTERS
+  // get reporters
   const usersResult = await pool.query(
     `
     SELECT id, name, role
@@ -76,7 +76,7 @@ const getAllIssues = async (query: IGetIssueQuery) => {
 
   const users = usersResult.rows;
 
-  // MERGE REPORTER WITH ISSUE
+  // marge reporter with issue
   const finalData = issues.map((issue) => {
     const reporter = users.find((user) => user.id === issue.reporter_id);
 
@@ -97,7 +97,7 @@ const getAllIssues = async (query: IGetIssueQuery) => {
   return finalData;
 };
 const getSingleIssue = async (id: number) => {
-  // GET ISSUE
+  // get issue
   const issueResult = await pool.query(
     `
     SELECT * FROM issues
@@ -108,12 +108,12 @@ const getSingleIssue = async (id: number) => {
 
   const issue = issueResult.rows[0];
 
-  // NOT FOUND
+  // not found
   if (!issue) {
     throw new Error("Issue not found");
   }
 
-  // GET REPORTER
+  // get reporter
   const userResult = await pool.query(
     `
     SELECT id, name, role
@@ -125,7 +125,7 @@ const getSingleIssue = async (id: number) => {
 
   const reporter = userResult.rows[0];
 
-  // FINAL RESPONSE
+  // final response
   return {
     id: issue.id,
     title: issue.title,
@@ -144,7 +144,7 @@ const updateIssue = async (
   payload: IUpdateIssue,
   user: JwtPayload,
 ) => {
-  // FIND ISSUE
+  // find issue
   const issueResult = await pool.query(
     `
     SELECT * FROM issues
@@ -155,25 +155,25 @@ const updateIssue = async (
 
   const issue = issueResult.rows[0];
 
-  // NOT FOUND
+  // not found
   if (!issue) {
     throw new Error("Issue not found");
   }
 
-  // CONTRIBUTOR RULES
+  // contributor rules
   if (user.role === "contributor") {
-    // own issue only
+    
     if (issue.reporter_id !== user.id) {
       throw new Error("You can update only your own issue");
     }
 
-    // only open issue
+    
     if (issue.status !== "open") {
       throw new Error("You can update only open issues");
     }
   }
 
-  // UPDATE VALUES
+  // update values
   const title = payload.title || issue.title;
 
   const description = payload.description || issue.description;
@@ -182,7 +182,7 @@ const updateIssue = async (
 
   const status = payload.status || issue.status;
 
-  // UPDATE QUERY
+  // update query
   const result = await pool.query(
     `
     UPDATE issues
@@ -201,7 +201,7 @@ const updateIssue = async (
   return result.rows[0];
 };
 const deleteIssue = async (issueId: number, user: JwtPayload) => {
-  // FIND ISSUE
+  // find issue
   const issueResult = await pool.query(
     `
     SELECT * FROM issues
@@ -212,17 +212,17 @@ const deleteIssue = async (issueId: number, user: JwtPayload) => {
 
   const issue = issueResult.rows[0];
 
-  // NOT FOUND
+  // not found
   if (!issue) {
     throw new Error("Issue not found");
   }
 
-  // ROLE CHECK (ONLY MAINTAINER)
+  // role check maintainer
   if (user.role !== "maintainer") {
     throw new Error("Only maintainer can delete issues");
   }
 
-  // DELETE
+  // delete
   await pool.query(
     `
     DELETE FROM issues
