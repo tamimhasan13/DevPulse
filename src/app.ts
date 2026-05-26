@@ -6,11 +6,16 @@ import express, {
 import cors from "cors";
 import { authRoute } from "./modules/auth/auth.route";
 import { issuesRoute } from "./modules/issues/issues.route";
+import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 
 const app: Application = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5000",
+  }),
+);
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
@@ -21,4 +26,5 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/auth", authRoute);
 app.use("/api/issues", issuesRoute);
 
+app.use(globalErrorHandler)
 export default app;
