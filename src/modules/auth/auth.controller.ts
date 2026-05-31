@@ -16,11 +16,11 @@ const signupUser = async (req: Request, res: Response) => {
         data: result,
       });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     sendResponse(res, {
       statusCode: 400,
       success: false,
-      message: error.message,
+      message: error instanceof Error ? error.message : "Something went wrong",
     });
   }
 };

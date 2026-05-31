@@ -1,6 +1,5 @@
 # 🚀 DevPulse – Internal Issue & Feature Tracker API
-
-DevPulse is a backend REST API for managing software issues (bugs & feature requests) with authentication, role-based access control, and PostgreSQL using raw SQL.
+DevPulse is a backend REST API for managing software issues (bugs & feature requests) with authentication, role-based access control, and PostgreSQL using raw SQL only (no ORM, no query builder).
 
 ---
 
@@ -12,6 +11,10 @@ DevPulse helps software teams to:
 - ✨ Request features
 - 📊 Track issue status
 - 🔄 Manage workflow (`open → in_progress → resolved`)
+ 
+# 🎯 Core Goal
+
+To demonstrate a modular, scalable backend architecture using TypeScript, Express, JWT authentication, and PostgreSQL.
 
 The project follows a clean modular architecture:
 
@@ -27,7 +30,7 @@ Controller → Service → Database Layer
 - TypeScript
 - Express.js
 - PostgreSQL
-- pg (native driver)
+- pg 
 - bcrypt
 - jsonwebtoken
 - dotenv
@@ -51,6 +54,7 @@ src/
 ├── middleware/
 │   ├── auth.middleware.ts
 │   ├── role.middleware.ts
+│   └── globalErrorHandler.ts
 │
 ├── modules/
 │   ├── auth/
@@ -67,7 +71,7 @@ src/
 │
 ├── types/
 │   ├── jwt.type.ts
-│   └── express.d.ts
+│   └── express.ts
 │
 ├── utils/
 │   ├── jwt.ts

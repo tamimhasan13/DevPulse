@@ -4,7 +4,7 @@ import sendResponse from "../../utils/sendResponse";
 
  const createIssueController = async (req: Request, res: Response) => {
   try {
-    const result = await issuesService.createIssue(req.body, req.user.id);
+    const result = await issuesService.createIssue(req.body, req.user!.id);
 
     
     sendResponse(res, {
@@ -16,7 +16,7 @@ import sendResponse from "../../utils/sendResponse";
   } catch (error: unknown) {
     
     sendResponse(res, {
-      statusCode: 201,
+      statusCode: 400,
       success: false,
       message: error instanceof Error ? error.message : "Error",
     });
@@ -36,7 +36,7 @@ import sendResponse from "../../utils/sendResponse";
     sendResponse(res, {
       statusCode: 500,
       success: false,
-      message: error instanceof Error ? error.message : "Error",
+      message: error instanceof Error ? error.message : "Internal Server Error",
     });
     
   }
@@ -78,7 +78,7 @@ const updateIssueController = async (req: Request, res: Response) => {
   } catch (error: unknown) {
     sendResponse(res, {
       statusCode: 400,
-      success: true,
+      success: false,
       message: error instanceof Error ? error.message : "Something went wrong",
     });
   }
@@ -95,14 +95,10 @@ const deleteIssueController = async (req: Request, res: Response) => {
       message: "Issue deleted successfully",
     });
   } catch (error: unknown) {
-    res.status(403).json({
-      success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
-    });
     sendResponse(res, {
       statusCode: 403,
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message: error instanceof Error ? error.message : "Internal Server Error",
     });
   }
 };
